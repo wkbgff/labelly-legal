@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>라벨리(Labelly) 회원 탈퇴</title>
+<style>
+  :root {
+    color-scheme: light dark;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    line-height: 1.7;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 24px 20px 80px;
+    color: #1a1a1a;
+    background: #ffffff;
+  }
+  h1 { font-size: 1.4rem; margin-top: 0; }
+  p.desc { color: #5e5e5e; font-size: 0.95rem; }
+  .notice {
+    background: #FFF7E6;
+    border: 1px solid #F5C542;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 1.2em 0 1.6em;
+    font-size: 0.88rem;
+  }
+  .warning-box {
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin: 0.8em 0;
+    font-size: 0.92rem;
+    font-weight: 600;
+    line-height: 1.6;
+  }
+  .warning-box.danger {
+    background: #FBEAEA;
+    border: 1px solid #f3c6c6;
+    color: #B3121C;
+  }
+  .warning-box.caution {
+    background: #FBF3DD;
+    border: 1px solid #f0dfa8;
+    color: #8a6d1a;
+  }
+  label {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin: 1.4em 0 0.5em;
+  }
+  input[type="email"], input.otp-digit {
+    font-family: inherit;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    background: #f7f7f7;
+    outline: none;
+    box-sizing: border-box;
+  }
+  input[type="email"] {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 1rem;
+  }
+  input[type="email"]:focus { border-color: #1a1a1a; background: #ffffff; }
+  .otp-row { display: flex; gap: 8px; margin: 1.2em 0; }
+  input.otp-digit {
+    width: 46px;
+    height: 54px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+  input.otp-digit:focus { border-color: #1a1a1a; background: #ffffff; }
+  input.otp-digit.error { border-color: #E5484D; background: rgba(229,72,77,0.05); }
+  button {
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  button.primary {
+    width: 100%;
+    height: 52px;
+    margin-top: 1.4em;
+    background: #0BC2BC;
+    color: #ffffff;
+  }
+  button.primary:disabled { opacity: 0.4; cursor: default; }
+  button.danger {
+    width: 100%;
+    height: 52px;
+    margin-top: 1.4em;
+    background: #E5484D;
+    color: #ffffff;
+  }
+  button.danger:disabled { opacity: 0.4; cursor: default; }
+  button.link {
+    background: none;
+    padding: 0;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-decoration: underline;
+  }
+  button.link:disabled { color: #999; cursor: default; text-decoration: none; }
+  .resend-row {
+    margin-top: 1em;
+    font-size: 0.88rem;
+    color: #5e5e5e;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .field-error { color: #E5484D; font-size: 0.85rem; margin-top: 0.5em; }
+  .field-notice { color: #5e5e5e; font-size: 0.85rem; margin-top: 0.5em; }
+  .step { display: none; }
+  .step.active { display: block; }
+  .result-icon { font-size: 2.6rem; text-align: center; margin: 0.6em 0 0.3em; }
+  .result-title { font-size: 1.2rem; font-weight: 700; text-align: center; }
+  .result-desc { color: #5e5e5e; text-align: center; font-size: 0.92rem; margin-top: 0.4em; }
+  a.back-link { display: inline-block; margin-top: 2em; font-size: 0.88rem; color: #5e5e5e; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #121212; color: #e8e8e8; }
+    p.desc { color: #b0b0b0; }
+    .notice { background: #3a2f10; border-color: #a67c1a; color: #f0ddb0; }
+    .warning-box.danger { background: #3a1414; border-color: #6b2a2a; color: #ff8a8f; }
+    .warning-box.caution { background: #3a2f10; border-color: #6b5a1a; color: #f0ddb0; }
+    input[type="email"], input.otp-digit { background: #1f1f1f; border-color: #333; color: #e8e8e8; }
+    input[type="email"]:focus, input.otp-digit:focus { border-color: #e8e8e8; background: #262626; }
+    button.link { color: #e8e8e8; }
+    .resend-row, .result-desc, a.back-link { color: #b0b0b0; }
+  }
+</style>
+</head>
+<body>
+
+<h1>라벨리(Labelly) 회원 탈퇴</h1>
+<p class="desc">가입하신 이메일로 본인 확인 후 탈퇴를 진행합니다. 앱을 삭제한 경우 등 앱에서 직접 탈퇴할 수 없을 때 이 페이지를 이용해주세요.</p>
+
+<div class="notice">
+  ⚠️ 이 페이지는 본인 확인이 완료된 계정만 탈퇴를 진행합니다. 이메일 인증번호를 알 수 없는 제3자는 계정을 삭제할 수 없습니다.
+</div>
+
+<!-- STEP 1: 이메일 입력 -->
+<section id="step-email" class="step active">
+  <label for="email-input">가입하신 이메일 주소</label>
+  <input type="email" id="email-input" placeholder="you@example.com" autocomplete="email">
+  <div id="email-error" class="field-error" style="display:none;"></div>
+  <button type="button" class="primary" id="send-otp-btn">인증번호 받기</button>
+</section>
+
+<!-- STEP 2: 인증번호 입력 -->
+<section id="step-otp" class="step">
+  <p class="desc"><strong id="otp-email-display"></strong>로 인증번호 6자리를 보냈어요.<br>이메일이 오지 않았다면 가입 시 사용한 이메일이 맞는지 다시 확인해주세요.</p>
+  <div class="otp-row" id="otp-row">
+    <input type="text" class="otp-digit" inputmode="numeric" maxlength="1" data-idx="0">
+    <input type="text" class="otp-digit" inputmode="numeric" maxlength="1" data-idx="1">
+    <input type="text" class="otp-digit" inputmode="numeric" maxlength="1" data-idx="2">
+    <input type="text" class="otp-digit" inputmode="numeric" maxlength="1" data-idx="3">
+    <input type="text" class="otp-digit" inputmode="numeric" maxlength="1" data-idx="4">
+    <input type="text" class="otp-digit" inputmode="numeric" maxlength="1" data-idx="5">
+  </div>
+  <div id="otp-error" class="field-error" style="display:none;"></div>
+  <button type="button" class="primary" id="verify-otp-btn" disabled>인증하기</button>
+  <div class="resend-row">
+    <span>인증번호를 받지 못하셨나요?</span>
+    <button type="button" class="link" id="resend-btn">재전송</button>
+  </div>
+  <div id="resend-notice" class="field-notice" style="display:none;">인증번호를 다시 보냈어요</div>
+</section>
+
+<!-- STEP 3: 삭제 확인 -->
+<section id="step-confirm" class="step">
+  <div class="warning-box danger">
+    정말 탈퇴하시겠어요? 탈퇴 시 모든 데이터가 삭제되며 복구할 수 없어요
+  </div>
+  <div class="warning-box caution">
+    탈퇴 시 라벨리 앱 이용 권한은 즉시 종료돼요. 다만 스토어 정기결제(자동갱신)는 별도로 남아있으니, 계속 청구되지 않으려면 App Store 또는 Google Play에서 구독을 직접 취소해주세요
+  </div>
+  <div class="warning-box danger">
+    이 작업은 되돌릴 수 없어요. 스캔 히스토리, 즐겨찾기 등 모든 개인 데이터가 삭제돼요.
+  </div>
+  <div id="delete-error" class="field-error" style="display:none;"></div>
+  <button type="button" class="danger" id="delete-btn">탈퇴할게요</button>
+</section>
+
+<!-- STEP 4: 완료/실패 -->
+<section id="step-done" class="step">
+  <div id="done-icon" class="result-icon"></div>
+  <div id="done-title" class="result-title"></div>
+  <div id="done-desc" class="result-desc"></div>
+</section>
+
+<a class="back-link" href="/">← 라벨리 안내로 돌아가기</a>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+// oasis-app 레포 frontend/.env의 값과 동일 — anon(publishable) key는 공개용으로
+// 설계된 값이라(RLS로 보호됨, service_role 키와 다름) 정적 페이지에 노출돼도 안전하다.
+const SUPABASE_URL = 'https://sthzmueifkgfxcixylry.supabase.co'
+const SUPABASE_ANON_KEY = 'sb_publishable_1QT3BVoN-fElLF5rXy9DGg_LTdrR83I'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+const RESEND_COOLDOWN_SECONDS = 60
+
+let currentEmail = ''
+let resendCooldownTimer = null
+
+const steps = {
+  email: document.getElementById('step-email'),
+  otp: document.getElementById('step-otp'),
+  confirm: document.getElementById('step-confirm'),
+  done: document.getElementById('step-done'),
+}
+
+function showStep(name) {
+  Object.values(steps).forEach((el) => el.classList.remove('active'))
+  steps[name].classList.add('active')
+}
+
+// --- STEP 1: 이메일 입력 ---
+const emailInput = document.getElementById('email-input')
+const emailError = document.getElementById('email-error')
+const sendOtpBtn = document.getElementById('send-otp-btn')
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+}
+
+async function requestOtp(email) {
+  // shouldCreateUser:false로 호출하면 Supabase가 "가입되지 않은 이메일"에 대해서만
+  // 422 { error_code: 'otp_disabled', msg: 'Signups not allowed for otp' }를 응답하고,
+  // 가입된 이메일은 200으로 조용히 성공한다 — 이 차이를 그대로 노출하면 "이 이메일이
+  // 가입돼 있는지 여부"가 새어나간다(실제로 개발 환경에서 재현 확인함, 2026-08-16).
+  // 그래서 이 함수는 어떤 경우든 호출부에 동일하게 "성공"으로만 알려준다. 등록되지
+  // 않은 이메일은 실제 메일이 발송되지 않으니 다음 단계(인증번호 입력)에서 자연스럽게
+  // 막힌다(입력할 진짜 코드 자체가 없으므로) — 요청 단계에서 응답으로 구분되는 것만
+  // 막으면 충분하다.
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: { shouldCreateUser: false },
+  })
+  if (error && error.code !== 'otp_disabled') {
+    throw error
+  }
+}
+
+sendOtpBtn.addEventListener('click', async () => {
+  const email = emailInput.value.trim()
+  emailError.style.display = 'none'
+  if (!isValidEmail(email)) {
+    emailError.textContent = '올바른 이메일 주소를 입력해주세요'
+    emailError.style.display = 'block'
+    return
+  }
+  sendOtpBtn.disabled = true
+  sendOtpBtn.textContent = '전송 중...'
+  try {
+    await requestOtp(email)
+    currentEmail = email
+    document.getElementById('otp-email-display').textContent = email
+    startResendCooldown()
+    showStep('otp')
+    otpDigits[0].focus()
+  } catch (err) {
+    console.error('signInWithOtp failed', err)
+    emailError.textContent =
+      err && err.status === 429
+        ? '요청이 너무 많아요. 잠시 후 다시 시도해주세요'
+        : '인증번호 발송에 실패했어요. 잠시 후 다시 시도해주세요'
+    emailError.style.display = 'block'
+  } finally {
+    sendOtpBtn.disabled = false
+    sendOtpBtn.textContent = '인증번호 받기'
+  }
+})
+
+// --- STEP 2: 인증번호 입력 ---
+const otpDigits = Array.from(document.querySelectorAll('.otp-digit'))
+const otpError = document.getElementById('otp-error')
+const verifyOtpBtn = document.getElementById('verify-otp-btn')
+const resendBtn = document.getElementById('resend-btn')
+const resendNotice = document.getElementById('resend-notice')
+
+function currentOtpValue() {
+  return otpDigits.map((d) => d.value).join('')
+}
+
+function updateVerifyEnabled() {
+  verifyOtpBtn.disabled = currentOtpValue().length !== 6
+}
+
+function resetOtpDigits() {
+  otpDigits.forEach((d) => {
+    d.value = ''
+    d.classList.remove('error')
+  })
+  updateVerifyEnabled()
+  otpDigits[0].focus()
+}
+
+otpDigits.forEach((input, idx) => {
+  input.addEventListener('input', () => {
+    input.value = input.value.replace(/[^0-9]/g, '').slice(-1)
+    input.classList.remove('error')
+    otpError.style.display = 'none'
+    if (input.value && idx < otpDigits.length - 1) otpDigits[idx + 1].focus()
+    updateVerifyEnabled()
+  })
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace' && !input.value && idx > 0) otpDigits[idx - 1].focus()
+  })
+})
+
+function startResendCooldown() {
+  let remaining = RESEND_COOLDOWN_SECONDS
+  resendBtn.disabled = true
+  resendBtn.textContent = `재전송 (${remaining}초)`
+  if (resendCooldownTimer) clearInterval(resendCooldownTimer)
+  resendCooldownTimer = setInterval(() => {
+    remaining -= 1
+    if (remaining <= 0) {
+      clearInterval(resendCooldownTimer)
+      resendBtn.disabled = false
+      resendBtn.textContent = '재전송'
+      return
+    }
+    resendBtn.textContent = `재전송 (${remaining}초)`
+  }, 1000)
+}
+
+resendBtn.addEventListener('click', async () => {
+  if (resendBtn.disabled) return
+  resendBtn.disabled = true
+  resendNotice.style.display = 'none'
+  try {
+    await requestOtp(currentEmail)
+    resendNotice.style.display = 'block'
+    resetOtpDigits()
+  } catch (err) {
+    console.error('resend failed', err)
+    otpError.textContent = '재전송에 실패했어요. 잠시 후 다시 시도해주세요'
+    otpError.style.display = 'block'
+  } finally {
+    startResendCooldown()
+  }
+})
+
+let verifiedSession = null
+
+verifyOtpBtn.addEventListener('click', async () => {
+  const token = currentOtpValue()
+  if (token.length !== 6) return
+  verifyOtpBtn.disabled = true
+  verifyOtpBtn.textContent = '확인 중...'
+  otpError.style.display = 'none'
+  try {
+    const { data, error } = await supabase.auth.verifyOtp({
+      email: currentEmail,
+      token,
+      type: 'email',
+    })
+    if (error || !data.session) {
+      otpDigits.forEach((d) => d.classList.add('error'))
+      otpError.textContent =
+        error && error.status === 429
+          ? '요청이 너무 많아요. 잠시 후 다시 시도해주세요'
+          : '인증번호가 올바르지 않거나 만료됐어요. 다시 확인해주세요'
+      otpError.style.display = 'block'
+      resetOtpDigits()
+      return
+    }
+    verifiedSession = data.session
+    showStep('confirm')
+  } catch (err) {
+    console.error('verifyOtp threw', err)
+    otpError.textContent = '일시적인 오류가 발생했어요. 잠시 후 다시 시도해주세요'
+    otpError.style.display = 'block'
+    resetOtpDigits()
+  } finally {
+    verifyOtpBtn.disabled = false
+    verifyOtpBtn.textContent = '인증하기'
+    updateVerifyEnabled()
+  }
+})
+
+// --- STEP 3: 삭제 확인 ---
+const deleteBtn = document.getElementById('delete-btn')
+const deleteError = document.getElementById('delete-error')
+
+deleteBtn.addEventListener('click', async () => {
+  if (!verifiedSession) return
+  deleteBtn.disabled = true
+  deleteBtn.textContent = '처리 중...'
+  deleteError.style.display = 'none'
+  try {
+    const { error } = await supabase.functions.invoke('delete-account', {
+      headers: { Authorization: `Bearer ${verifiedSession.access_token}` },
+    })
+    if (error) throw error
+    await supabase.auth.signOut()
+    showDone(true)
+  } catch (err) {
+    console.error('delete-account invoke failed', err)
+    deleteError.textContent = '탈퇴 처리 중 오류가 발생했어요. 잠시 후 다시 시도해주세요'
+    deleteError.style.display = 'block'
+  } finally {
+    deleteBtn.disabled = false
+    deleteBtn.textContent = '탈퇴할게요'
+  }
+})
+
+// --- STEP 4: 완료/실패 ---
+function showDone(success) {
+  const icon = document.getElementById('done-icon')
+  const title = document.getElementById('done-title')
+  const desc = document.getElementById('done-desc')
+  if (success) {
+    icon.textContent = '✅'
+    title.textContent = '탈퇴가 완료됐어요'
+    desc.textContent = '그동안 라벨리를 이용해주셔서 감사합니다.'
+  } else {
+    icon.textContent = '⚠️'
+    title.textContent = '탈퇴 처리에 실패했어요'
+    desc.textContent = '잠시 후 다시 시도해주시거나 labellysupport@gmail.com으로 문의해주세요.'
+  }
+  showStep('done')
+}
+</script>
+
+</body>
+</html>
